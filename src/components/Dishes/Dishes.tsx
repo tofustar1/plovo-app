@@ -2,10 +2,11 @@ import DishItem from "./DishItem.tsx";
 import type {Dish} from "../../types";
 
 interface Props {
-  dishes: Dish[]
+  dishes: Dish[];
+  addToCart: (dish: Dish) => void;
 }
 
-const Dishes = ({dishes}: Props) => {
+const Dishes = ({dishes, addToCart}: Props) => {
   return (
     <div>
       <h4>Dishes</h4>
@@ -13,6 +14,7 @@ const Dishes = ({dishes}: Props) => {
         <DishItem
           key={dish.id}
           dish={dish}
+          addToCart={() => addToCart(dish)}
         />
       ))}
     </div>

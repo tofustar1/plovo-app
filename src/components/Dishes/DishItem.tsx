@@ -1,10 +1,12 @@
 import type {Dish} from "../../types";
+import type {MouseEventHandler} from "react";
 
 interface Props {
   dish: Dish;
+  addToCart: MouseEventHandler;
 }
 
-const DishItem = ({dish}: Props) => {
+const DishItem = ({dish, addToCart}: Props) => {
   const placeholder = 'https://cdn-icons-png.flaticon.com/512/857/857681.png';
   const image = dish.image || placeholder;
 
@@ -13,7 +15,7 @@ const DishItem = ({dish}: Props) => {
   };
 
   return (
-    <div className="card mb-2">
+    <div className="card mb-2" onClick={addToCart}>
       <div className="row g-x-0">
         <div className="col-sm-4 rounded-start" style={imageStyle}/>
         <div className="col-sm-8">

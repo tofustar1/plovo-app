@@ -4,7 +4,7 @@ import DishForm from "./components/DishForm/DishForm.tsx";
 import Dishes from "./components/Dishes/Dishes.tsx";
 import Cart from "./components/Cart/Cart.tsx";
 import {useState} from "react";
-import type {Dish} from "./types";
+import type {CartDish, Dish} from "./types";
 
 const App = () => {
   const [dishes, setDishes] = useState<Dish[]>([
@@ -12,8 +12,27 @@ const App = () => {
     {id: crypto.randomUUID(), name: 'Lagman', description: 'Amazing dish!', image: 'https://img.iamcook.ru/2018/upl/recipes/cat/u-be7fa4f2d632b7e8e0e1b4bd326cb8d2.jpg', price: 250},
   ]);
 
+  const [cartDishes, setCartDishes] = useState<CartDish[]>([]);
+
   const addDish = (dish: Dish) => {
     setDishes(prevState => [...prevState, dish]);
+  };
+
+  const addDishToCart = (dish: Dish) => {
+    setCartDishes(prevState => {
+      const existingIndex = prevState
+        .findIndex(cartItem => cartItem.dish === dish);
+
+      if (existingIndex !== -1) {
+        const itemsCopy = [...prevState];
+        const itemCopy = {...itemsCopy[existingIndex]};
+        itemCopy.amount++;
+        itemsCopy[existingIndex] = itemCopy;
+        return itemsCopy;
+      }
+
+      return [...prevState, {dish, amount: 1}]
+    });
   };
 
   return (
@@ -27,10 +46,10 @@ const App = () => {
             <DishForm onSubmit={addDish}/>
           </div>
           <div className="col-4">
-            <Dishes dishes={dishes} />
+            <Dishes dishes={dishes} addToCart={addDishToCart}/>
           </div>
           <div className="col-4">
-            <Cart/>
+            <Cart cartDishes={cartDishes}/>
           </div>
         </div>
       </main>
