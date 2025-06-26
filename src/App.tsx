@@ -1,10 +1,12 @@
 import Toolbar from "./components/Toolbar/Toolbar.tsx";
 import './App.css'
-import DishForm from "./components/DishForm/DishForm.tsx";
-import Dishes from "./components/Dishes/Dishes.tsx";
-import Cart from "./components/Cart/Cart.tsx";
 import {useState} from "react";
 import type {CartDish, Dish} from "./types";
+import Home from "./containers/Home/Home.tsx";
+import NewDish from "./containers/NewDish/NewDish.tsx";
+import {Route, Routes} from "react-router-dom";
+import Checkout from "./containers/Checkout/Checkout.tsx";
+import Order from "./containers/Order/Order.tsx";
 
 const App = () => {
   const [dishes, setDishes] = useState<Dish[]>([
@@ -40,18 +42,24 @@ const App = () => {
       <header>
         <Toolbar/>
       </header>
-      <main className="container-fluid">
-        <div className="row mt-3">
-          <div className="col-4">
-            <DishForm onSubmit={addDish}/>
-          </div>
-          <div className="col-4">
-            <Dishes dishes={dishes} addToCart={addDishToCart}/>
-          </div>
-          <div className="col-4">
-            <Cart cartDishes={cartDishes}/>
-          </div>
-        </div>
+      <main className="container">
+        <Routes>
+          <Route path="/" element={(
+            <Home
+              cartDishes={cartDishes}
+              dishes={dishes}
+              addToCart={addDishToCart}
+            />
+          )}/>
+          <Route path="/new-dish" element={(
+            <NewDish onCreate={addDish}/>
+          )}
+          />
+          <Route path="/checkout" element={<Checkout cartDishes={cartDishes}/>}>
+            <Route path="continue" element={<Order/>}/>
+          </Route>
+          <Route path="*" element={<h1>Not Found</h1>}/>
+        </Routes>
       </main>
     </>
   )
