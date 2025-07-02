@@ -1,5 +1,6 @@
 import type {Dish} from "../../types";
 import type {MouseEventHandler} from "react";
+import {Link} from "react-router-dom";
 
 interface Props {
   dish: Dish;
@@ -23,6 +24,7 @@ const DishItem = ({dish, addToCart}: Props) => {
             <h5 className="card-title">{dish.name}</h5>
             <p className="card-text small">{dish.description}</p>
             <p className="card-text">{dish.price} KGS</p>
+            <Link to={'/dishes/' + dish.id}>Read more</Link>
           </div>
         </div>
       </div>

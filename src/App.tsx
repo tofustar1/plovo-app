@@ -7,6 +7,7 @@ import NewDish from "./containers/NewDish/NewDish.tsx";
 import {Route, Routes} from "react-router-dom";
 import Checkout from "./containers/Checkout/Checkout.tsx";
 import Order from "./containers/Order/Order.tsx";
+import DishInfo from "./components/DishInfo/DishInfo.tsx";
 
 const App = () => {
   const [dishes, setDishes] = useState<Dish[]>([
@@ -44,20 +45,28 @@ const App = () => {
       </header>
       <main className="container">
         <Routes>
-          <Route path="/" element={(
-            <Home
-              cartDishes={cartDishes}
-              dishes={dishes}
-              addToCart={addDishToCart}
-            />
-          )}/>
+          {
+            ['/', '/dishes'].map(path => (
+              <Route
+                path={path}
+                element={(
+                  <Home
+                    cartDishes={cartDishes}
+                    dishes={dishes}
+                    addToCart={addDishToCart}
+                  />
+                )}
+              />
+            ))
+          }
           <Route path="/new-dish" element={(
             <NewDish onCreate={addDish}/>
           )}
           />
           <Route path="/checkout" element={<Checkout cartDishes={cartDishes}/>}>
-            <Route path="continue" element={<Order/>}/>
+            <Route path="continue" element={<Order cartDishes={cartDishes}/>}/>
           </Route>
+          <Route path="/dishes/:id" element={<DishInfo/>}/>
           <Route path="*" element={<h1>Not Found</h1>}/>
         </Routes>
       </main>

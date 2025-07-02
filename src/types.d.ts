@@ -17,3 +17,14 @@ export interface CartDish {
   dish: Dish;
   amount: number;
 }
+
+export interface Customer {
+  name: string;
+  address: string;
+  phone: string;
+}
+
+export interface OrderData {
+  customer: Customer;
+  dishes: CartDish[];
+}
