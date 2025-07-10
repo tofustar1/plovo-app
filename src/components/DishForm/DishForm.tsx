@@ -1,19 +1,25 @@
-import type {Dish, DishMutation} from "../../types";
+import type {DishMutation, TypeApiDish} from "../../types";
 import {type ChangeEvent, type FormEvent, useState} from "react";
 
 interface Props {
-  onSubmit: (dish: Dish) => void;
+  onSubmit: (dish: TypeApiDish) => void;
+  editedDish?: TypeApiDish;
 }
 
-const initialDish: DishMutation = {
-  name: '',
-  description: '',
-  image: '',
-  price: ''
-}
-
-const DishForm = ({onSubmit}: Props) => {
-  const [dish, setDish] = useState<DishMutation>(initialDish);
+const DishForm = ({onSubmit, editedDish}: Props) => {
+  const [dish, setDish] = useState<DishMutation>(editedDish ?
+      {
+        ...editedDish,
+        price: editedDish.price.toString()
+      }
+      :
+      {
+        name: '',
+        description: '',
+        image: '',
+        price: ''
+      }
+  );
 
   const changeDish = (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const {name, value} = event.target;
@@ -29,17 +35,15 @@ const DishForm = ({onSubmit}: Props) => {
     event.preventDefault();
 
     onSubmit({
-      id: crypto.randomUUID(),
       ...dish,
-      price: parseFloat(dish.price)
+      price: Number(dish.price)
     });
 
-    setDish(initialDish);
   };
 
   return (
     <form onSubmit={onSubmitHandler}>
-      <h4>Add dish</h4>
+      <h4>{editedDish ? 'Edit dish' : 'Add dish'}</h4>
       <div className="form-group">
         <label htmlFor="name">Name</label>
         <input
@@ -83,7 +87,7 @@ const DishForm = ({onSubmit}: Props) => {
           onChange={changeDish}
         />
       </div>
-      <button type="submit" className="btn btn-primary">Create</button>
+      <button type="submit" className="btn btn-primary">{editedDish ? 'Edit' : 'Create'}</button>
     </form>
   );
 };

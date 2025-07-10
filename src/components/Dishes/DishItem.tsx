@@ -16,15 +16,18 @@ const DishItem = ({dish, addToCart}: Props) => {
   };
 
   return (
-    <div className="card mb-2" onClick={addToCart}>
+    <div className="card mb-2" >
       <div className="row g-x-0">
         <div className="col-sm-4 rounded-start" style={imageStyle}/>
-        <div className="col-sm-8">
+        <div className="col-sm-8 border-start ps-0">
           <div className="card-body">
             <h5 className="card-title">{dish.name}</h5>
             <p className="card-text small">{dish.description}</p>
             <p className="card-text">{dish.price} KGS</p>
-            <Link to={'/dishes/' + dish.id}>Read more</Link>
+          </div>
+          <div className="card-footer">
+            <button className="btn btn-success me-2" onClick={addToCart}>Add</button>
+            <Link className="btn btn-primary" to={'/dishes/edit/' + dish.id}>Edit</Link>
           </div>
         </div>
       </div>
