@@ -1,14 +1,15 @@
 import {type ChangeEvent, type FC, type FormEvent, useState} from 'react';
-import type {CartDish, Customer, OrderData} from "../../types";
+import type {CartDish, Customer, ApiOrder} from "../../types";
 import axiosApi from "../../axiosApi.ts";
 import {useNavigate} from "react-router-dom";
 import Spinner from "../../components/Spinner/Spinner.tsx";
 
 interface Props {
-  cartDishes: CartDish[]
+  cartDishes: CartDish[];
+  clearCart: () => void;
 }
 
-const Order: FC<Props> = ({cartDishes}) => {
+const CustomerForm: FC<Props> = ({cartDishes, clearCart}) => {
   const navigate = useNavigate();
 
   const [customer, setCustomer] = useState<Customer>({
@@ -33,7 +34,7 @@ const Order: FC<Props> = ({cartDishes}) => {
 
     setLoading(true);
 
-    const order: OrderData = {
+    const order: ApiOrder = {
       customer,
       dishes: cartDishes
     };
@@ -42,6 +43,7 @@ const Order: FC<Props> = ({cartDishes}) => {
       await axiosApi.post('/orders.json', order);
     } finally {
       setLoading(false);
+      clearCart();
       navigate('/');
     }
   };
@@ -100,4 +102,4 @@ const Order: FC<Props> = ({cartDishes}) => {
   );
 };
 
-export default Order;
+export default CustomerForm;

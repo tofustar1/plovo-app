@@ -1,25 +1,23 @@
-import type {DishMutation, TypeApiDish} from "../../types";
+import type {DishMutation, ApiDish} from "../../types";
 import {type ChangeEvent, type FormEvent, useState} from "react";
+import SpinnerButton from "../Spinner/SpinnerButton.tsx";
 
 interface Props {
-  onSubmit: (dish: TypeApiDish) => void;
-  editedDish?: TypeApiDish;
+  onSubmit: (dish: ApiDish) => void;
+  existingDish?: DishMutation;
+  isEdit?: boolean;
+  isLoading?: boolean;
 }
 
-const DishForm = ({onSubmit, editedDish}: Props) => {
-  const [dish, setDish] = useState<DishMutation>(editedDish ?
-      {
-        ...editedDish,
-        price: editedDish.price.toString()
-      }
-      :
-      {
-        name: '',
-        description: '',
-        image: '',
-        price: ''
-      }
-  );
+const initialState: DishMutation = {
+  name: '',
+  description: '',
+  image: '',
+  price: ''
+};
+
+const DishForm = ({onSubmit, existingDish = initialState, isEdit = false, isLoading = false}: Props) => {
+  const [dish, setDish] = useState<DishMutation>(existingDish);
 
   const changeDish = (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const {name, value} = event.target;
@@ -43,7 +41,7 @@ const DishForm = ({onSubmit, editedDish}: Props) => {
 
   return (
     <form onSubmit={onSubmitHandler}>
-      <h4>{editedDish ? 'Edit dish' : 'Add dish'}</h4>
+      <h4>{isEdit ? 'Edit dish' : 'Add dish'}</h4>
       <div className="form-group">
         <label htmlFor="name">Name</label>
         <input
@@ -87,7 +85,14 @@ const DishForm = ({onSubmit, editedDish}: Props) => {
           onChange={changeDish}
         />
       </div>
-      <button type="submit" className="btn btn-primary">{editedDish ? 'Edit' : 'Create'}</button>
+      <button
+        type="submit"
+        className="btn btn-primary"
+        disabled={isLoading}
+      >
+        {isLoading && <SpinnerButton/>}
+        {isEdit ? 'Edit' : 'Create'}
+      </button>
     </form>
   );
 };

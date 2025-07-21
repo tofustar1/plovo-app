@@ -1,7 +1,7 @@
-import {useEffect, useState} from "react";
+import {useCallback, useEffect, useState} from "react";
 import axiosApi from "../../axiosApi.ts";
 import {useNavigate, useParams} from "react-router-dom";
-import type {TypeApiDish} from "../../types";
+import type {ApiDish} from "../../types";
 import DishForm from "../../components/DishForm/DishForm.tsx";
 import Spinner from "../../components/Spinner/Spinner.tsx";
 
@@ -9,33 +9,43 @@ const EditDish = () => {
   const { id } = useParams();
   const navigate = useNavigate();
 
-  const [dish, setDish] = useState<TypeApiDish | null>(null);
+  const [dish, setDish] = useState<ApiDish | null>(null);
+  const [updating, setUpdating] = useState(false);
 
-  useEffect(() => {
-    const fetchDish = async() => {
-      const response = await axiosApi<TypeApiDish>(`/dishes/${id}.json`);
+  const fetchDish = useCallback(async() => {
+    const response = await axiosApi<ApiDish>(`/dishes/${id}.json`);
 
-      setDish(response.data);
-    };
-
-    void fetchDish();
+    setDish(response.data);
   }, [id]);
 
-  const onUpdateDish = async (updatedDish: TypeApiDish) => {
+  useEffect(() => {
+    void fetchDish();
+  }, [fetchDish]);
+
+  const onUpdateDish = async (updatedDish: ApiDish) => {
     try {
+      setUpdating(true);
       await axiosApi.put(`/dishes/${id}.json`, updatedDish);
-    } finally {
       navigate('/');
+    } finally {
+      setUpdating(false);
     }
-  }
+  };
+
+  const existingDish = dish && {
+    ...dish,
+    price: dish.price.toString()
+  };
 
   return (
     <div className="row mt-2">
       <div className="col-6 m-auto">
-        {dish ?
+        {existingDish ?
           <DishForm
             onSubmit={onUpdateDish}
-            editedDish={dish}
+            existingDish={existingDish}
+            isEdit
+            isLoading={updating}
           />
           :
           <Spinner/>

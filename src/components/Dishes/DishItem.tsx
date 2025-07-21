@@ -5,9 +5,10 @@ import {Link} from "react-router-dom";
 interface Props {
   dish: Dish;
   addToCart: MouseEventHandler;
+  onDelete: MouseEventHandler;
 }
 
-const DishItem = ({dish, addToCart}: Props) => {
+const DishItem = ({dish, addToCart, onDelete}: Props) => {
   const placeholder = 'https://cdn-icons-png.flaticon.com/512/857/857681.png';
   const image = dish.image || placeholder;
 
@@ -26,6 +27,7 @@ const DishItem = ({dish, addToCart}: Props) => {
             <p className="card-text">{dish.price} KGS</p>
           </div>
           <div className="card-footer">
+            <button className="btn btn-danger me-2" onClick={onDelete}>Delete</button>
             <button className="btn btn-success me-2" onClick={addToCart}>Add</button>
             <Link className="btn btn-primary" to={'/dishes/edit/' + dish.id}>Edit</Link>
           </div>

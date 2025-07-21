@@ -1,31 +1,61 @@
-import Toolbar from "./components/Toolbar/Toolbar.tsx";
-import './App.css'
 import {useCallback, useEffect, useState} from "react";
-import type {CartDish, Dish, ListDishes} from "./types";
+import type {CartDish, Dish, DishesList} from "./types";
 import Home from "./containers/Home/Home.tsx";
 import NewDish from "./containers/NewDish/NewDish.tsx";
 import {Route, Routes, useLocation} from "react-router-dom";
 import Checkout from "./containers/Checkout/Checkout.tsx";
-import Order from "./containers/Order/Order.tsx";
+import CustomerForm from "./containers/CustomerForm/CustomerForm.tsx";
 import axiosApi from "./axiosApi.ts";
 import EditDish from "./containers/EditDish/EditDish.tsx";
+import Orders from "./containers/Orders/Orders.tsx";
+import Layout from "./components/Layout/Layout.tsx";
+import './App.css'
 
 const App = () => {
   const location = useLocation();
 
   const [dishes, setDishes] = useState<Dish[]>([]);
   const [cartDishes, setCartDishes] = useState<CartDish[]>([]);
+  const [loading, setLoading] = useState(false);
+
+  const updateCart = useCallback((dishes: Dish[]) => {
+    setCartDishes(prev => {
+      const newCartDishes: CartDish[] = [];
+
+      prev.forEach(cartDish => {
+        const existingDish = dishes.find(dish => cartDish.dish.id === dish.id);
+
+        if (!existingDish) {
+          return;
+        }
+
+        newCartDishes.push({
+          ...cartDish,
+          dish: existingDish
+        });
+      });
+
+      return newCartDishes;
+    });
+  }, []);
 
   const fetchDishes = useCallback(async () => {
-    const { data } = await axiosApi.get<ListDishes>('/dishes.json');
-    const apiDishes = Object.keys(data).map((key) => {
-      const dish = data[key];
-      dish.id = key;
-      return dish;
-    });
+    try {
+      setLoading(true);
+      const { data } = await axiosApi.get<DishesList | null>('/dishes.json');
 
-    setDishes(apiDishes);
-  }, []);
+      if(!data) {
+        return;
+      }
+
+      const apiDishes = Object.keys(data).map((key) => ({...data[key], id: key }));
+
+      setDishes(apiDishes);
+      updateCart(apiDishes);
+    } finally {
+      setLoading(false);
+    }
+  }, [updateCart]);
 
   useEffect(() => {
     if (location.pathname === "/") {
@@ -50,36 +80,38 @@ const App = () => {
     });
   };
 
+  const clearCart = () => {
+    setCartDishes([]);
+  };
+
   return (
-    <>
-      <header>
-        <Toolbar/>
-      </header>
-      <main className="container">
-        <Routes>
-          {
-            ['/', '/dishes'].map(path => (
-              <Route
-                path={path}
-                element={(
-                  <Home
-                    cartDishes={cartDishes}
-                    dishes={dishes}
-                    addToCart={addDishToCart}
-                  />
-                )}
-              />
-            ))
-          }
-          <Route path="/new-dish" element={(<NewDish/>)}/>
-          <Route path="/dishes/edit/:id" element={<EditDish/>}/>
-          <Route path="/checkout" element={<Checkout cartDishes={cartDishes}/>}>
-            <Route path="continue" element={<Order cartDishes={cartDishes}/>}/>
-          </Route>
-          <Route path="*" element={<h1>Not Found</h1>}/>
-        </Routes>
-      </main>
-    </>
+    <Layout>
+      <Routes>
+        {
+          ['/', '/dishes'].map(path => (
+            <Route
+              path={path}
+              element={(
+                <Home
+                  cartDishes={cartDishes}
+                  dishes={dishes}
+                  addToCart={addDishToCart}
+                  dishesLoading={loading}
+                  fetchDishes={fetchDishes}
+                />
+              )}
+            />
+          ))
+        }
+        <Route path="/new-dish" element={(<NewDish/>)}/>
+        <Route path="/dishes/edit/:id" element={<EditDish/>}/>
+        <Route path="/checkout" element={<Checkout cartDishes={cartDishes}/>}>
+          <Route path="continue" element={<CustomerForm cartDishes={cartDishes} clearCart={clearCart}/>}/>
+        </Route>
+        <Route path="/orders" element={<Orders/>}/>
+        <Route path="*" element={<h1>Not Found</h1>}/>
+      </Routes>
+    </Layout>
   )
 };
 

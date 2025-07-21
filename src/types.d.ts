@@ -6,7 +6,7 @@ export interface Dish {
   price: number;
 }
 
-export type TypeApiDish = Omit<Dish, 'id'>
+export type ApiDish = Omit<Dish, 'id'>
 
 export interface DishMutation {
   name: string;
@@ -15,7 +15,7 @@ export interface DishMutation {
   price: string;
 }
 
-export interface ListDishes {
+export interface DishesList {
   [id: string]: ApiDish
 }
 
@@ -30,7 +30,16 @@ export interface Customer {
   phone: string;
 }
 
-export interface OrderData {
+export interface ApiOrder {
   customer: Customer;
   dishes: CartDish[];
+}
+
+export interface OrdersList {
+  [id: string]: ApiOrder;
+}
+
+export interface Order extends ApiOrder {
+  id: string;
+  totalPrice: number;
 }
