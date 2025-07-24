@@ -1,16 +1,17 @@
-import {type ChangeEvent, type FC, type FormEvent, useState} from 'react';
-import type {CartDish, Customer, ApiOrder} from "../../types";
+import {type ChangeEvent, type FormEvent, useState} from 'react';
+import type {Customer, ApiOrder} from "../../types";
 import axiosApi from "../../axiosApi.ts";
 import {useNavigate} from "react-router-dom";
 import Spinner from "../../components/Spinner/Spinner.tsx";
+import {useDispatch} from "react-redux";
+import {clearCart, selectCartDishes} from "../../store/cartSlice.ts";
+import {useAppSelector} from "../../app/hooks.ts";
 
-interface Props {
-  cartDishes: CartDish[];
-  clearCart: () => void;
-}
-
-const CustomerForm: FC<Props> = ({cartDishes, clearCart}) => {
+const CustomerForm = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+
+  const cartDishes = useAppSelector(selectCartDishes);
 
   const [customer, setCustomer] = useState<Customer>({
     name: '',
@@ -41,10 +42,10 @@ const CustomerForm: FC<Props> = ({cartDishes, clearCart}) => {
 
     try {
       await axiosApi.post('/orders.json', order);
+      dispatch(clearCart());
+      navigate('/');
     } finally {
       setLoading(false);
-      clearCart();
-      navigate('/');
     }
   };
 

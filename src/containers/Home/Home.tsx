@@ -1,42 +1,15 @@
-import {type FC} from 'react';
-import Dishes from "../../components/Dishes/Dishes.tsx";
-import Cart from "../../components/Cart/Cart.tsx";
-import type {CartDish, Dish} from "../../types";
-import Spinner from "../../components/Spinner/Spinner.tsx";
-import axiosApi from "../../axiosApi.ts";
+import Dishes from "../Dishes/Dishes.tsx";
+import Cart from "../Cart/Cart.tsx";
 
-interface Props {
-  dishes: Dish[]
-  addToCart: (dish: Dish) => void
-  cartDishes: CartDish[]
-  dishesLoading: boolean
-  fetchDishes: () => Promise<void>
-}
-
-const Home:FC<Props> = ({dishes, addToCart, cartDishes, dishesLoading, fetchDishes}) => {
-
-  const deleteDish = async (id: string) => {
-    if (window.confirm('Do you really want to delete this dish?')) {
-      await axiosApi.delete(`/dishes/${id}.json`);
-      await fetchDishes();
-    }
-  };
+const Home = () => {
 
   return (
     <div className="row mt-2">
       <div className="col-7">
-        {dishesLoading ?
-          <Spinner/>
-          :
-          <Dishes
-            dishes={dishes}
-            addToCart={addToCart}
-            deleteDish={deleteDish}
-          />
-        }
+        <Dishes/>
       </div>
       <div className="col-5">
-        <Cart cartDishes={cartDishes}/>
+        <Cart/>
       </div>
     </div>
   );
