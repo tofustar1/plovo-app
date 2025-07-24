@@ -1,8 +1,13 @@
 import {createAsyncThunk} from "@reduxjs/toolkit";
 import axiosApi from "../axiosApi.ts";
-import type {Dish, DishesList} from "../types";
+import type {ApiDish, Dish, DishesList} from "../types";
 import type {AppDispatch} from "../app/store.ts";
 import {updateCart} from "./cartSlice.ts";
+
+interface UpdateDishParams {
+  id: string;
+  dish: ApiDish;
+}
 
 export const fetchDishes = createAsyncThunk<Dish[], undefined, {dispatch: AppDispatch}>(
   'dishes/fetchAll',
@@ -17,6 +22,33 @@ export const fetchDishes = createAsyncThunk<Dish[], undefined, {dispatch: AppDis
 
     thunkAPI.dispatch(updateCart(newDishes));
     return newDishes;
+  }
+);
+
+export const fetchOneDish = createAsyncThunk<ApiDish, string>(
+  'dishes/fetchOne',
+  async (id) => {
+    const {data: dish} = await axiosApi<ApiDish | null>(`/dishes/${id}.json`);
+
+    if (!dish) {
+      throw new Error('Not found');
+    }
+
+    return dish;
+  }
+);
+
+export const createDish = createAsyncThunk<void, ApiDish>(
+  'dishes/create',
+  async (apiDish) => {
+    await axiosApi.post('/dishes.json', apiDish);
+  }
+);
+
+export const updateDish = createAsyncThunk<void, UpdateDishParams>(
+  'dishes/update',
+  async ({id, dish}) => {
+    await axiosApi.put(`/dishes/${id}.json`, dish);
   }
 );
 

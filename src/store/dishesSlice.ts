@@ -1,17 +1,24 @@
-import type {Dish} from "../types";
+import type {ApiDish, Dish} from "../types";
 import {createSlice} from "@reduxjs/toolkit";
-import {deleteDish, fetchDishes} from "./dishesThunks.ts";
-import type {RootState} from "../app/store.ts";
+import {createDish, deleteDish, fetchDishes, fetchOneDish, updateDish} from "./dishesThunks.ts";
 
 interface DishesState {
   items: Dish[];
+  oneDish: null | ApiDish;
   fetchLoading: boolean;
+  fetchOneLoading: boolean;
+  createLoading: boolean;
+  updateLoading: boolean;
   deleteLoading: boolean | string;
 }
 
 const initialState: DishesState = {
   items: [],
+  oneDish: null,
   fetchLoading: false,
+  fetchOneLoading: false,
+  createLoading: false,
+  updateLoading: false,
   deleteLoading: false,
 };
 
@@ -33,6 +40,41 @@ const dishesSlice = createSlice({
       });
 
     builder
+      .addCase(fetchOneDish.pending, (state) => {
+        state.fetchOneLoading = true;
+        state.oneDish = null;
+      })
+      .addCase(fetchOneDish.fulfilled, (state, {payload: ApiDish}) => {
+        state.fetchOneLoading = false;
+        state.oneDish = ApiDish;
+      })
+      .addCase(fetchOneDish.rejected, (state) => {
+        state.fetchOneLoading = false;
+      });
+
+    builder
+      .addCase(createDish.pending, (state) => {
+        state.createLoading = true;
+      })
+      .addCase(createDish.fulfilled, (state) => {
+        state.createLoading = false;
+      })
+      .addCase(createDish.rejected, (state) => {
+        state.createLoading = false;
+      });
+
+    builder
+      .addCase(updateDish.pending, (state) => {
+        state.updateLoading = true;
+      })
+      .addCase(updateDish.fulfilled, (state) => {
+        state.updateLoading = false;
+      })
+      .addCase(updateDish.rejected, (state) => {
+        state.updateLoading = false;
+      });
+
+    builder
       .addCase(deleteDish.pending, (state, {meta}) => {
         state.deleteLoading = meta.arg;
       })
@@ -41,12 +83,27 @@ const dishesSlice = createSlice({
       })
       .addCase(deleteDish.rejected, (state) => {
         state.deleteLoading = false;
-      })
+      });
+  },
+  selectors: {
+    selectDishes: (state) => state.items,
+    selectOneDish: (state) => state.oneDish,
+    selectFetchDishesLoading: (state) => state.fetchLoading,
+    selectFetchOneDishLoading: (state) => state.fetchOneLoading,
+    selectCreateDishLoading: (state) => state.createLoading,
+    selectUpdateLoading: (state) => state.updateLoading,
+    selectDeleteDishLoading: (state) => state.deleteLoading,
   }
 });
 
 export const dishesReducer = dishesSlice.reducer;
 
-export const selectDishes = (state: RootState) => state.dishes.items;
-export const selectFetchDishesLoading = (state: RootState) => state.dishes.fetchLoading;
-export const selectDeleteDishLoading = (state: RootState) => state.dishes.deleteLoading;
+export const {
+  selectDishes,
+  selectFetchDishesLoading,
+  selectDeleteDishLoading,
+  selectCreateDishLoading,
+  selectOneDish,
+  selectFetchOneDishLoading,
+  selectUpdateLoading
+} = dishesSlice.selectors;

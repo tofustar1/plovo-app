@@ -1,6 +1,5 @@
 import type {CartDish, Dish} from "../types";
 import {createSlice, type PayloadAction} from "@reduxjs/toolkit";
-import type {RootState} from "../app/store.ts";
 
 interface CartState {
   cartDishes: CartDish[]
@@ -46,6 +45,9 @@ const cartSlice = createSlice({
 
       state.cartDishes = newCartDishes;
     }
+  },
+  selectors: {
+    selectCartDishes: state => state.cartDishes,
   }
 });
 
@@ -53,4 +55,4 @@ const cartSlice = createSlice({
 export const cartReducer = cartSlice.reducer;
 export const {addDish, clearCart, updateCart} = cartSlice.actions;
 
-export const selectCartDishes = (state: RootState) => state.cart.cartDishes;
+export const {selectCartDishes} = cartSlice.selectors;
